@@ -2,6 +2,8 @@ import 'package:blockpark/views/HomeView.dart';
 import 'package:blockpark/views/PostView.dart';
 import 'package:blockpark/views/ProfileView.dart';
 import 'package:blockpark/views/SearchView.dart';
+import 'package:blockpark/views/landing/LoginView.dart';
+import 'package:blockpark/views/landing/SignupView.dart';
 import 'package:blockpark/widgets/navigation/BottomNavigation.dart';
 import 'package:blockpark/widgets/navigation/NavigationRail.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +27,12 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   final List<Widget> _screens = [
+    const SignupView(),
+    const LoginView(),
     const HomeView(),
     const PostView(),
-    const SearchView(),
-    const ProfileView(),
+    //const SearchView(),
+    //const ProfileView(),
   ];
 
   int _selectedIndex = 0;
