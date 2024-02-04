@@ -1,3 +1,4 @@
+import 'package:blockpark/widgets/appBar/Header.dart';
 import 'package:flutter/material.dart';
 
 class PostView extends StatefulWidget {
@@ -10,6 +11,9 @@ class PostView extends StatefulWidget {
 class _PostViewState extends State<PostView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold(
+      appBar: Header(),
+      body: Placeholder(),
+    );
   }
 }

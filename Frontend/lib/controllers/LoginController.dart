@@ -1,13 +1,16 @@
 import 'dart:convert';
+import 'package:blockpark/providers/AuthProvider.dart';
+import 'package:blockpark/routing/UserRouting.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class LoginController {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   static const URL = 'http://localhost:3000';
 
-  Future<void> loginUser(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<void> loginUser(ScaffoldMessengerState scaffoldMessenger, BuildContext context) async {
     final userEmail = email.text.trim();
     final userPassword = password.text.trim();
 
@@ -29,6 +32,15 @@ class LoginController {
         scaffoldMessenger.showSnackBar(
           const SnackBar(
             content: Text('Login successful'),
+          ),
+        );
+
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        authProvider.login(userEmail);
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const UserRouting(),
           ),
         );
       } else {

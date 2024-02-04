@@ -1,3 +1,4 @@
+import 'package:blockpark/widgets/appBar/Header.dart';
 import 'package:flutter/material.dart';
 
 class SearchView extends StatefulWidget {
@@ -10,6 +11,9 @@ class SearchView extends StatefulWidget {
 class _SearchViewState extends State<SearchView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold(
+      appBar: Header(),
+      body: Placeholder(),
+    );
   }
 }

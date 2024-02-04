@@ -1,10 +1,11 @@
+import 'package:blockpark/logo/BlockParkLogo.dart';
 import 'package:blockpark/utils/colors.dart';
 import 'package:blockpark/views/landing/LoginView.dart';
 import 'package:blockpark/views/landing/forms/SignupForm.dart';
 import 'package:flutter/material.dart';
 
 class SignupView extends StatelessWidget {
-  const SignupView({Key? key});
+  const SignupView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +20,7 @@ class SignupView extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 50),
+                  const BlockParkLogo(),
                   const SizedBox(height: 50),
                   SignupForm(scaffoldMessenger: scaffoldMessenger),
                   const SizedBox(height: 20),
