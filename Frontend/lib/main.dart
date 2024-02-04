@@ -1,19 +1,17 @@
-import 'package:blockpark/views/HomeView.dart';
-import 'package:blockpark/views/PostView.dart';
-import 'package:blockpark/views/ProfileView.dart';
-import 'package:blockpark/views/SearchView.dart';
-import 'package:blockpark/views/landing/LoginView.dart';
-import 'package:blockpark/views/landing/SignupView.dart';
-import 'package:blockpark/widgets/navigation/BottomNavigation.dart';
-import 'package:blockpark/widgets/navigation/NavigationRail.dart';
+import 'package:blockpark/providers/AuthProvider.dart';
+import 'package:blockpark/routing/LandingRouting.dart';
+import 'package:blockpark/routing/UserRouting.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MyApp(),
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: MyApp(),
+      ),
     ),
   );
 }
@@ -26,37 +24,21 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  final List<Widget> _screens = [
-    const SignupView(),
-    const LoginView(),
-    const HomeView(),
-    const PostView(),
-    //const SearchView(),
-    //const ProfileView(),
-  ];
-
-  int _selectedIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.checkLoggedInUser();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomNavigation(
-        selectedIndex: _selectedIndex,
-        onTabTapped: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
-      body: NavigationRailWidget(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        screens: _screens,
-      ),
-    );
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    if (authProvider.isLoggedIn) {
+      return const UserRouting();
+    } else {
+      return const LandingRouting();
+    }
   }
 }

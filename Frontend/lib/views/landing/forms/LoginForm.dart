@@ -17,10 +17,10 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     return Form(
-      key: _formKey,
+      key: formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -61,8 +61,8 @@ class _LoginFormState extends State<LoginForm> {
             alignment: Alignment.center,
             child: OutlinedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  controller.loginUser(widget.scaffoldMessenger);
+                if (formKey.currentState!.validate()) {
+                  controller.loginUser(widget.scaffoldMessenger, context);
                 }
               },
               child: const Text('Login'), 
