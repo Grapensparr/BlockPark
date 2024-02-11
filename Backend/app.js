@@ -7,6 +7,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const userRouter = require('./routes/users');
+const parkingRouter = require('./routes/parking');
 
 const app = express();
 
@@ -32,5 +33,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/users', userRouter);
+app.use('/parking', parkingRouter);
 
 module.exports = { app: app, server: server };
