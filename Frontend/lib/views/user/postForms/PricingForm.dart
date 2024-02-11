@@ -32,7 +32,7 @@ class _PricingFormState extends State<PricingForm> {
             'Pricing',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -44,9 +44,12 @@ class _PricingFormState extends State<PricingForm> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.3,
+                    width: 200,
                     child: TextField(
-                      decoration: const InputDecoration(labelText: 'Price per hour'),
+                      decoration: const InputDecoration(
+                        labelText: 'Price per hour (ETH)*',
+                        hintText: 'Price per hour (ETH)*',
+                      ),
                       onChanged: widget.onPricePerHourChanged,
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
@@ -62,7 +65,7 @@ class _PricingFormState extends State<PricingForm> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Payment schedule:'),
+              const Text('Payment schedule*:'),
               Column(
                 children: [
                   Row(

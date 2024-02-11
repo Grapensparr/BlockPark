@@ -25,12 +25,16 @@ class AddressForm extends StatelessWidget {
             'Address',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           TextField(
-            decoration: const InputDecoration(labelText: 'Address'),
+            decoration: const InputDecoration(
+              labelText: 'Address*',
+              hintText: 'Address*',
+              border: OutlineInputBorder(),
+            ),
             onChanged: onAddressChanged,
           ),
           const SizedBox(height: 16),
@@ -38,7 +42,11 @@ class AddressForm extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(labelText: 'Zip code'),
+                  decoration: const InputDecoration(
+                    labelText: 'Zip code*',
+                    hintText: 'Zip code*',
+                    border: OutlineInputBorder(),
+                  ),
                   onChanged: onZipCodeChanged,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   keyboardType: TextInputType.number,
@@ -47,7 +55,11 @@ class AddressForm extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(labelText: 'City'),
+                  decoration: const InputDecoration(
+                    labelText: 'City*',
+                    hintText: 'City*',
+                    border: OutlineInputBorder(),
+                  ),
                   onChanged: onCityChanged,
                 ),
               ),

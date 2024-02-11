@@ -43,7 +43,7 @@ class _AvailabilityFormState extends State<AvailabilityForm> {
             'Availability',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -43,7 +43,7 @@ class _DetailsFormState extends State<DetailsForm> {
             'Details',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -84,8 +84,13 @@ class _DetailsFormState extends State<DetailsForm> {
               const Text('Extra wide parking space'),
             ],
           ),
+          const SizedBox(height: 16),
           TextField(
-            decoration: const InputDecoration(labelText: 'Additional information'),
+            decoration: const InputDecoration(
+              labelText: 'Additional information',
+              hintText: 'Additional information',
+              border: OutlineInputBorder()
+            ),
             onChanged: widget.onAdditionalInfoChanged,
             maxLines: null,
             controller: TextEditingController(text: widget.additionalInfo),
