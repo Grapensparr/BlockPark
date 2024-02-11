@@ -75,4 +75,16 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/idByEmail', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await UserModel.findOne({ email });
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: err });
+  }
+});
+
 module.exports = router;
