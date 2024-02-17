@@ -85,7 +85,7 @@ router.post('/updateStatus', async (req, res) => {
     res.status(200).json({ msg: 'Listing updated successfully', parkingSpace });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Failed to update parking status' });
+    res.status(500).json({ msg: 'Failed to update listing status' });
   }
 });
 

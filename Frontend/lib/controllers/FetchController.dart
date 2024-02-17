@@ -44,6 +44,45 @@ class FetchController {
     }
   }
 
+  static Future<List<dynamic>> fetchParkingSpacesByRenter() async {
+    try {
+      final authProvider = AuthProvider();
+      await authProvider.checkLoggedInUser();
+
+      final ownerEmail = authProvider.loggedInUserEmail;
+
+      if (ownerEmail != null) {
+        final userId = await getUserIdByEmail(ownerEmail);
+
+        if (userId != null) {
+          final response = await http.post(
+            Uri.parse('$baseUrl/parking/fetchByRenter'),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'renterId': userId,
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            List<dynamic> parkingSpaces = jsonDecode(response.body);
+            
+            return parkingSpaces;
+          } else {
+            throw Exception('Failed to fetch parking spaces');
+          }
+        } else {
+          throw Exception('User ID not found');
+        }
+      } else {
+        throw Exception('User is not logged in');
+      }
+    } catch (e) {
+      throw Exception('Error fetching parking spaces: $e');
+    }
+  }
+
   static Future<String?> getUserIdByEmail(String email) async {
     try {
       final response = await http.post(

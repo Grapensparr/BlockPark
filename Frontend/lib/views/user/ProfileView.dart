@@ -11,8 +11,10 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  late Future<List<dynamic>> _futureParkingSpaces;
-  final Map<String, bool> _isExpanded = {};
+  late Future<List<dynamic>> _futureOwnerParkingSpaces;
+  late Future<List<dynamic>> _futureRenterParkingSpaces;
+  final Map<String, bool> _isExpanded = {'Parking spaces as owner': false, 'Parking spaces as renter': false};
+  final List<String> _categories = ['Parking spaces as owner', 'Parking spaces as renter'];
 
   @override
   void initState() {
@@ -21,7 +23,8 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   void _fetchParkingSpacesData() {
-    _futureParkingSpaces = FetchController.fetchParkingSpacesByOwner();
+    _futureOwnerParkingSpaces = FetchController.fetchParkingSpacesByOwner();
+    _futureRenterParkingSpaces = FetchController.fetchParkingSpacesByRenter();
   }
 
   @override
@@ -29,22 +32,84 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: const Header(),
       body: FutureBuilder<List<dynamic>>(
-        future: _futureParkingSpaces,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+        future: _futureOwnerParkingSpaces,
+        builder: (context, ownerSnapshot) {
+          if (ownerSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (ownerSnapshot.hasError) {
+            return Center(child: Text('Error: ${ownerSnapshot.error}'));
           } else {
-            List<dynamic> parkingSpaces = snapshot.data ?? [];
-            return ListView(
-              children: [
-                ListingCard('Available', parkingSpaces, 'available', _isExpanded, _fetchParkingSpacesData, refreshData),
-                ListingCard('Rented out', parkingSpaces, 'rented', _isExpanded, _fetchParkingSpacesData, refreshData),
-                ListingCard('Renting complete', parkingSpaces, 'rentingComplete', _isExpanded, _fetchParkingSpacesData, refreshData),
-                ListingCard('On hold', parkingSpaces, 'onHold', _isExpanded, _fetchParkingSpacesData, refreshData),
-                ListingCard('Expired', parkingSpaces, 'expired', _isExpanded, _fetchParkingSpacesData, refreshData),
-              ],
+            List<dynamic> ownerParkingSpaces = ownerSnapshot.data ?? [];
+
+            return FutureBuilder<List<dynamic>>(
+              future: _futureRenterParkingSpaces,
+              builder: (context, renterSnapshot) {
+                if (renterSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (renterSnapshot.hasError) {
+                  return Center(child: Text('Error: ${renterSnapshot.error}'));
+                } else {
+                  List<dynamic> renterParkingSpaces = renterSnapshot.data ?? [];
+
+                  return ListView(
+                    children: [
+                      for (var category in _categories)
+                        ExpansionPanelList(
+                          expansionCallback: (int index, bool isExpanded) {
+                            setState(() {
+                              _isExpanded[category] = !isExpanded;
+                            });
+                          },
+                          children: [
+                            ExpansionPanel(
+                              headerBuilder: (BuildContext context, bool isExpanded) {
+                                return ListTile(
+                                  title: Text(
+                                    category,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _isExpanded[category] = !_isExpanded[category]!;
+                                    });
+                                  },
+                                );
+                              },
+                              body: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Column(
+                                  children: [
+                                    if (_isExpanded[category]! && category == 'Parking spaces as owner')
+                                      Column(
+                                        children: [
+                                          ListingCard('Available', ownerParkingSpaces, 'available', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                          ListingCard('Rented out', ownerParkingSpaces, 'rented', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                          ListingCard('Renting complete', ownerParkingSpaces, 'rentingComplete', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                          ListingCard('On hold', ownerParkingSpaces, 'onHold', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                          ListingCard('Expired', ownerParkingSpaces, 'expired', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                        ],
+                                      ),
+                                    if (_isExpanded[category]! && category == 'Parking spaces as renter')
+                                      Column(
+                                        children: [
+                                          ListingCard('Current', renterParkingSpaces, 'rented', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                          ListingCard('Renting complete', renterParkingSpaces, 'rentingComplete', _isExpanded, _fetchParkingSpacesData, refreshData),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              isExpanded: _isExpanded[category]!,
+                            ),
+                          ],
+                        ),
+                    ],
+                  );
+                }
+              },
             );
           }
         },

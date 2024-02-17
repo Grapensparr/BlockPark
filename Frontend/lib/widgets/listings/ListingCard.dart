@@ -164,7 +164,7 @@ class ListingCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          width: 100,
+                          width: 101,
                           child: ElevatedButton(
                             onPressed: () async {
                               await UpdateController.updateParkingStatus('${listing['_id']}', 'available', context);
