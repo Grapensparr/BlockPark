@@ -83,6 +83,25 @@ class FetchController {
     }
   }
 
+  static Future<Map<String, int>> fetchStatusCounts() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/parking/statusCounts'));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'available': data['available'] ?? 0,
+          'rented': data['rented'] ?? 0,
+          'rentingComplete': data['rentingComplete'] ?? 0,
+        };
+      } else {
+        throw Exception('Failed to fetch status counts');
+      }
+    } catch (e) {
+      throw Exception('Error fetching status counts: $e');
+    }
+  }
+
   static Future<String?> getUserIdByEmail(String email) async {
     try {
       final response = await http.post(

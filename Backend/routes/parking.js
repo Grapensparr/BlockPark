@@ -187,4 +187,21 @@ router.post('/search', async (req, res) => {
   }
 });
 
+router.get('/statusCounts', async (req, res) => {
+  try {
+    const availableCount = await ParkingModel.countDocuments({ status: 'available' });
+    const rentedCount = await ParkingModel.countDocuments({ status: 'rented' });
+    const rentingCompleteCount = await ParkingModel.countDocuments({ status: 'rentingComplete' });
+
+    res.status(200).json({
+      available: availableCount,
+      rented: rentedCount,
+      rentingComplete: rentingCompleteCount
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Failed to fetch status counts' });
+  }
+});
+
 module.exports = router;
