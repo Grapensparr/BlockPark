@@ -1,4 +1,6 @@
+import 'package:blockpark/controllers/SearchController.dart' as MySearchController;
 import 'package:blockpark/widgets/appBar/Header.dart';
+import 'package:blockpark/widgets/listings/SearchCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,8 +34,10 @@ class _SearchViewState extends State<SearchView> {
   ];
 
   Map<String, Map<String, TimeOfDay>> dayTimes = {};
-
   Set<String> selectedDays = <String>{};
+  final ScrollController _scrollController = ScrollController();
+  bool _showSearchResults = false;
+  List<Map<String, dynamic>> _searchResults = [];
 
   @override
   void initState() {
@@ -53,6 +57,48 @@ class _SearchViewState extends State<SearchView> {
   void dispose() {
     _priceController.dispose();
     super.dispose();
+  }
+
+  Future<void> _searchParking() async {
+    Map<String, Map<String, String>> dayTimesAsString = {};
+    dayTimes.forEach((day, times) {
+      String startHour = times['start']!.hour.toString().padLeft(2, '0');
+      String startMinute = times['start']!.minute.toString().padLeft(2, '0');
+      String endHour = times['end']!.hour.toString().padLeft(2, '0');
+      String endMinute = times['end']!.minute.toString().padLeft(2, '0');
+
+      dayTimesAsString[day] = {
+        'start': '$startHour:$startMinute',
+        'end': '$endHour:$endMinute',
+      };
+    });
+
+    final List<Map<String, dynamic>> searchResult = await MySearchController.SearchController.searchParking(
+      city: _city,
+      endDate: _endDate,
+      price: _unlimitedPrice ? null : _price,
+      accessibility: _accessibility,
+      largeVehicles: _largeVehicles,
+      selectedDays: selectedDays.toList(),
+      dayTimes: dayTimesAsString,
+      isGarage: _isGarage,
+      isParkingSpace: _isParkingSpace,
+    );
+
+    setState(() {
+      _searchResults = searchResult;
+      _showSearchResults = true;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_showSearchResults) {
+        _scrollController.animateTo(
+          MediaQuery.of(context).size.height * 1,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
@@ -284,18 +330,37 @@ class _SearchViewState extends State<SearchView> {
                   ),
                   const SizedBox(height: 16.0),
                   ElevatedButton(
-                    onPressed: () {
-                      print('City: $_city');
-                      print('End date: $_endDate');
-                      print('Price: $_price');
-                      print('Garage: $_isGarage');
-                      print('Parking space: $_isParkingSpace');
-                      print('Accessibility: $_accessibility');
-                      print('Large vehicles: $_largeVehicles');
-                      print('Selected days: $selectedDays');
-                      print('Day times: $dayTimes');
-                    },
+                    onPressed: _searchParking,
                     child: const Text('Search'),
+                  ),
+
+                  Visibility(
+                    visible: _showSearchResults,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: Text(
+                                'Search results',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Column(
+                            children: _searchResults.map((result) {
+                              return SearchCard(result);
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

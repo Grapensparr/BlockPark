@@ -106,4 +106,85 @@ router.post('/delete', async (req, res) => {
   }
 });
 
+router.post('/search', async (req, res) => {
+  const {
+    city,
+    endDate,
+    price,
+    isGarage,
+    isParkingSpace,
+    accessibility,
+    largeVehicles,
+    selectedDays,
+    dayTimes,
+  } = req.body;
+
+  try {
+    console.log(req.body);
+    let query = {};
+
+    if (city) {
+      query.city = city;
+    }
+
+    if (endDate) {
+      if (endDate === null) {
+        query.endDate = null;
+      } else {
+        query.$or = [{ endDate: { $gte: new Date(endDate) } }, { endDate: null }];
+      }
+    }
+
+    if (price !== undefined && price !== null) {
+      query.price = price;
+    }
+
+    if (isGarage && isParkingSpace) {
+      query.$or = [{ isGarage: true }, { isParkingSpace: true }];
+    } else {
+      if (isGarage) {
+        query.isGarage = true;
+      }
+
+      if (isParkingSpace) {
+        query.isParkingSpace = true;
+      }
+    }
+
+    if (accessibility) {
+      query.accessibility = accessibility;
+    }
+
+    if (largeVehicles) {
+      query.largeVehicles = largeVehicles;
+    }
+
+    if (selectedDays && dayTimes && selectedDays.length > 0) {
+      const dayQueries = selectedDays.map(day => {
+        const startTime = dayTimes[day].start;
+        const endTime = dayTimes[day].end;
+        return {
+          [`dayTimes.${day}.start`]: { $lte: startTime },
+          [`dayTimes.${day}.end`]: { $gte: endTime },
+        };
+      });
+      
+      if (dayQueries.length > 0) {
+        query.$and = dayQueries;
+      } else {
+        query = {};
+      }
+    }
+
+    query.status = 'available';
+
+    const parkingSpaces = await ParkingModel.find(query);
+
+    res.status(200).json(parkingSpaces);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Failed to perform search' });
+  }
+});
+
 module.exports = router;
