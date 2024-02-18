@@ -59,12 +59,21 @@ class ListingCard extends StatelessWidget {
                       style: TextStyle(fontSize: 14),
                     ),
                     for (var day in listing['dayTimes'].keys)
-                      if (listing['dayTimes'][day]['start'] != '00:00' && listing['dayTimes'][day]['end'] != '00:00')
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Text(
-                            '$day: ${listing['dayTimes'][day]['start']} - ${listing['dayTimes'][day]['end']}',
-                            style: const TextStyle(fontSize: 14),
+                      if (listing['dayTimes'] != null)
+                        SizedBox(
+                          width: double.infinity,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (listing['dayTimes'][day] is Map<String, dynamic>)
+                                  Text(
+                                    '$day: ${listing['dayTimes'][day]['start']} - ${listing['dayTimes'][day]['end']}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                     Text(
