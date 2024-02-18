@@ -218,8 +218,8 @@ class _PostViewState extends State<PostView> {
                           MapEntry(
                             entry.key,
                             {
-                              'start': '${entry.value['start']!.hour}:${entry.value['start']!.minute}',
-                              'end': '${entry.value['end']!.hour}:${entry.value['end']!.minute}',
+                              'start': '${entry.value['start']!.hour.toString().padLeft(2, '0')}:${entry.value['start']!.minute.toString().padLeft(2, '0')}',
+                              'end': '${entry.value['end']!.hour.toString().padLeft(2, '0')}:${entry.value['end']!.minute.toString().padLeft(2, '0')}',
                             },
                           ),
                         ),

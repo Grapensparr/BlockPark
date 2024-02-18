@@ -44,7 +44,7 @@ const ParkingSchema = mongoose.Schema({
       end: String
     }
   },
-  status: { type: String, enum: ['available', 'rented', 'onHold', 'cancelled', 'expired', 'rentingCancelled', 'rentingComplete'], default: 'available' },
+  status: { type: String, enum: ['available', 'rented', 'onHold', 'cancelled', 'expired', 'rentingComplete'], default: 'available' },
   review: { type: String, default: null },
   rating: { type: Number, min: 1, max: 5, default: null }
 });
