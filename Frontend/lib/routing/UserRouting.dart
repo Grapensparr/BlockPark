@@ -1,3 +1,4 @@
+import 'package:blockpark/views/user/ChatView.dart';
 import 'package:blockpark/views/user/HomeView.dart';
 import 'package:blockpark/views/user/PostView.dart';
 import 'package:blockpark/views/user/ProfileView.dart';
@@ -18,6 +19,7 @@ class _UserRoutingState extends State<UserRouting> {
     const HomeView(),
     const PostView(),
     const SearchView(),
+    const ChatView(),
     const ProfileView()
   ];
 

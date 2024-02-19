@@ -25,6 +25,7 @@ class NavigationRailWidget extends StatelessWidget {
               NavigationRailDestination(icon: Icon(Icons.home), label: Text("Home")),
               NavigationRailDestination(icon: Icon(Icons.edit), label: Text("Post")),
               NavigationRailDestination(icon: Icon(Icons.search), label: Text("Search")),
+              NavigationRailDestination(icon: Icon(Icons.message), label: Text("Chats")),
               NavigationRailDestination(icon: Icon(Icons.person), label: Text("Profile")),
             ],
             labelType: NavigationRailLabelType.all,

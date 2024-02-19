@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const userRouter = require('./routes/users');
 const parkingRouter = require('./routes/parking');
+const chatRouter = require('./routes/chat');
 
 const app = express();
 
@@ -25,6 +26,15 @@ db.on('error', err => {
   console.error('connection error:', err);
 });
 
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+require('./socket')(io)
+
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
@@ -34,5 +44,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/users', userRouter);
 app.use('/parking', parkingRouter);
+app.use('/chat', chatRouter);
 
 module.exports = { app: app, server: server };

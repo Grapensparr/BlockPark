@@ -105,7 +105,7 @@ class SearchCard extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  
+
                 },
                 child: const Text('Contact Owner'),
               ),
