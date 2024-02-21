@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:blockpark/widgets/chats/ChatData.dart';
+import 'package:blockpark/widgets/chats/MessageModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:blockpark/providers/AuthProvider.dart';
 
@@ -130,6 +131,30 @@ class ChatController {
     } catch (e) {
       print('Error fetching user: $e');
       return null;
+    }
+  }
+
+  static Future<List<MessageModel>> fetchMessagesByChatId(String chatId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/fetchMessages'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'chatId': chatId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> messagesData = jsonDecode(response.body);
+        List<MessageModel> messages = messagesData.map((data) => MessageModel.fromJson(data)).toList();
+        return messages;
+      } else {
+        throw Exception('Failed to fetch messages by chat ID: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching messages by chat ID: $e');
     }
   }
 }

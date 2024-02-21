@@ -116,9 +116,9 @@ class SearchCard extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChatDetails(
-                          chatId: chatData['chatId'],
+                          chatId: chatData['_id'],
                           onClose: () {
-                            UserRouting.userRoutingKey.currentState?.updateChatId(chatData['chatId']);
+                            UserRouting.userRoutingKey.currentState?.updateChatId(chatData['_id']);
                           },
                         ),
                       ),
