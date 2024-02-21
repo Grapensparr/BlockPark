@@ -6,24 +6,40 @@ import 'package:blockpark/providers/AuthProvider.dart';
 class ChatController {
   static const String baseUrl = 'http://localhost:3000';
 
-  static Future<Map<String, dynamic>> createOrFetchChat(String owner, String renter) async {
+  static Future<Map<String, dynamic>> createOrFetchChat(String owner, String parkingSpaceId) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/chat/new'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'owner': owner,
-          'renter': renter,
-        }),
-      );
+      final authProvider = AuthProvider();
+      await authProvider.checkLoggedInUser();
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final chatData = jsonDecode(response.body);
-        return chatData;
+      final userEmail = authProvider.loggedInUserEmail;
+
+      if (userEmail != null) {
+        final renter = await getUserIdByEmail(userEmail);
+
+        if (renter != null) {
+          final response = await http.post(
+            Uri.parse('$baseUrl/chat/new'),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'owner': owner,
+              'renter': renter,
+              'parkingSpaceId': parkingSpaceId,
+            }),
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final chatData = jsonDecode(response.body);
+            return chatData;
+          } else {
+            throw Exception('Failed to create or fetch chat: ${response.body}');
+          }
+        } else {
+          throw Exception('User ID not found');
+        }
       } else {
-        throw Exception('Failed to create or fetch chat: ${response.body}');
+        throw Exception('Owner email not found');
       }
     } catch (e) {
       throw Exception('Error creating or fetching chat: $e');

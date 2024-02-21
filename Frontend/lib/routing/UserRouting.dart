@@ -1,3 +1,4 @@
+import 'package:blockpark/views/user/ChatDetails.dart';
 import 'package:blockpark/views/user/ChatView.dart';
 import 'package:blockpark/views/user/HomeView.dart';
 import 'package:blockpark/views/user/PostView.dart';
@@ -8,11 +9,14 @@ import 'package:blockpark/widgets/navigation/NavigationRail.dart';
 import 'package:flutter/material.dart';
 
 class UserRouting extends StatefulWidget {
-  const UserRouting({super.key});
+  static final GlobalKey<_UserRoutingState> userRoutingKey = GlobalKey<_UserRoutingState>();
+
+  const UserRouting({Key? key}) : super(key: key);
 
   @override
   _UserRoutingState createState() => _UserRoutingState();
 }
+
 
 class _UserRoutingState extends State<UserRouting> {
   final List<Widget> _screens = [
@@ -24,6 +28,8 @@ class _UserRoutingState extends State<UserRouting> {
   ];
 
   int _selectedIndex = 0;
+  String _chatId = '';
+  bool _isChatOpen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +39,46 @@ class _UserRoutingState extends State<UserRouting> {
         onTabTapped: (int index) {
           setState(() {
             _selectedIndex = index;
+            _isChatOpen = false;
           });
         },
       ),
-      body: NavigationRailWidget(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        screens: _screens,
+      body: Stack(
+        children: [
+          NavigationRailWidget(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+                _isChatOpen = false;
+              });
+            },
+            screens: _screens,
+          ),
+          if (_isChatOpen)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: ChatDetails(
+                onClose: () {
+                  setState(() {
+                    _isChatOpen = false;
+                  });
+                }, 
+                chatId: _chatId,
+              ),
+            ),
+        ],
       ),
     );
+  }
+
+  void updateChatId(String id) {
+    setState(() {
+      _chatId = id;
+      _isChatOpen = true;
+    });
   }
 }

@@ -6,6 +6,11 @@ const ChatSchema = mongoose.Schema({
     required: true,
     unique: true
   },
+  parkingSpace: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Parking',
+    required: true
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

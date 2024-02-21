@@ -1,3 +1,6 @@
+import 'package:blockpark/controllers/ChatController.dart';
+import 'package:blockpark/routing/UserRouting.dart';
+import 'package:blockpark/views/user/ChatDetails.dart';
 import 'package:flutter/material.dart';
 
 class SearchCard extends StatelessWidget {
@@ -104,8 +107,28 @@ class SearchCard extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-
+                onPressed: () async {
+                  String ownerUserId = searchData['owner'];
+                  String parkingSpaceId = searchData['_id'];
+                  try {
+                    Map<String, dynamic> chatData = await ChatController.createOrFetchChat(ownerUserId, parkingSpaceId);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatDetails(
+                          chatId: chatData['chatId'],
+                          onClose: () {
+                            UserRouting.userRoutingKey.currentState?.updateChatId(chatData['chatId']);
+                          },
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    print('Error contacting owner: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Error contacting owner. Please try again later.'),
+                    ));
+                  }
                 },
                 child: const Text('Contact Owner'),
               ),

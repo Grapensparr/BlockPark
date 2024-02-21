@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ChatModel {
-  String chatId;
-  String userId;
-  String currentMessage;
-  IconData icon;
-  String time;
-  bool status;
+  final String chatId;
+  final String userId;
+  final String currentMessage;
+  final IconData icon;
+  final String time;
+  final bool isReadByOwner;
+  final bool isReadByRenter;
+  final String parkingAddress;
+  final String parkingZipCode;
+  final String parkingCity;
 
   ChatModel({
     required this.chatId,
@@ -14,6 +18,10 @@ class ChatModel {
     required this.currentMessage,
     required this.icon,
     required this.time,
-    required this.status,
+    required this.isReadByOwner,
+    required this.isReadByRenter,
+    required this.parkingAddress,
+    required this.parkingZipCode,
+    required this.parkingCity,
   });
 }

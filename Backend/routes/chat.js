@@ -1,20 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const ChatModel = require('../models/chatModel');
+const ParkingModel = require('../models/parkingModel');
+const { v4: uuidv4 } = require('uuid');
 
 router.post('/new', async (req, res) => {
-  const { owner, renter } = req.body;
+  const { owner, renter, parkingSpaceId } = req.body;
 
   try {
-    const existingChat = await ChatModel.findOne({ owner, renter });
+    const existingChat = await ChatModel.findOne({ owner, renter, parkingSpace: parkingSpaceId });
 
     if (existingChat) {
-      const chatId = existingChat._id;
-      const chat = await ChatModel.findById(chatId);
-      return res.status(200).json(chat);
+      return res.status(200).json(existingChat);
     }
 
-    const newChat = new ChatModel({ owner, renter });
+    const chatId = uuidv4();
+    const newChat = new ChatModel({ chatId, owner, renter, parkingSpace: parkingSpaceId });
+
+    const initialMessage = {
+      senderId: renter,
+      text: 'A new chat was created',
+      timestamp: new Date(),
+      readByOwner: false,
+      readByRenter: true
+    };
+
+    newChat.messages.push(initialMessage);
+
     await newChat.save();
 
     res.status(201).json(newChat);
@@ -47,18 +59,20 @@ router.post('/fetchAllByUser', async (req, res) => {
 
     const chatData = await Promise.all(chats.map(async chat => {
       const otherUserId = chat.owner !== userId ? chat.owner : chat.renter;
-      const latestMessage = await MessageModel.findOne({ chatId: chat._id }).sort({ createdAt: -1 });
-      const isReadByBoth = latestMessage.readByOwner && latestMessage.readByRenter;
+      const parkingSpace = await ParkingModel.findById(chat.parkingSpace);
+      const latestMessage = chat.messages.slice(-1)[0];
 
       return {
         chatId: chat._id,
         otherUserId,
+        parkingSpace,
         latestMessage: {
-          content: latestMessage.content,
-          sender: latestMessage.sender,
-          createdAt: latestMessage.createdAt
+          content: latestMessage.text,
+          sender: latestMessage.senderId,
+          createdAt: latestMessage.timestamp
         },
-        isReadByBoth
+        isReadByOwner: latestMessage.readByOwner,
+        isReadByRenter: latestMessage.readByRenter
       };
     }));
 
