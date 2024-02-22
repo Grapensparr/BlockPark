@@ -10,34 +10,28 @@ class FetchController {
       final authProvider = AuthProvider();
       await authProvider.checkLoggedInUser();
 
-      final ownerEmail = authProvider.loggedInUserEmail;
+      final userId = authProvider.loggedInUserId;
 
-      if (ownerEmail != null) {
-        final userId = await getUserIdByEmail(ownerEmail);
+      if (userId != null) {
+        final response = await http.post(
+          Uri.parse('$baseUrl/parking/fetchByOwner'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'ownerId': userId,
+          }),
+        );
 
-        if (userId != null) {
-          final response = await http.post(
-            Uri.parse('$baseUrl/parking/fetchByOwner'),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({
-              'ownerId': userId,
-            }),
-          );
+        if (response.statusCode == 200) {
+          List<dynamic> parkingSpaces = jsonDecode(response.body);
 
-          if (response.statusCode == 200) {
-            List<dynamic> parkingSpaces = jsonDecode(response.body);
-
-            return parkingSpaces;
-          } else {
-            throw Exception('Failed to fetch parking spaces');
-          }
+          return parkingSpaces;
         } else {
-          throw Exception('User ID not found');
+          throw Exception('Failed to fetch parking spaces');
         }
       } else {
-        throw Exception('User is not logged in');
+        throw Exception('User ID not found');
       }
     } catch (e) {
       throw Exception('Error fetching parking spaces: $e');
@@ -49,37 +43,54 @@ class FetchController {
       final authProvider = AuthProvider();
       await authProvider.checkLoggedInUser();
 
-      final ownerEmail = authProvider.loggedInUserEmail;
+      final userId = authProvider.loggedInUserId;
 
-      if (ownerEmail != null) {
-        final userId = await getUserIdByEmail(ownerEmail);
+      if (userId != null) {
+        final response = await http.post(
+          Uri.parse('$baseUrl/parking/fetchByRenter'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'renterId': userId,
+          }),
+        );
 
-        if (userId != null) {
-          final response = await http.post(
-            Uri.parse('$baseUrl/parking/fetchByRenter'),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({
-              'renterId': userId,
-            }),
-          );
-
-          if (response.statusCode == 200) {
-            List<dynamic> parkingSpaces = jsonDecode(response.body);
-            
-            return parkingSpaces;
-          } else {
-            throw Exception('Failed to fetch parking spaces');
-          }
+        if (response.statusCode == 200) {
+          List<dynamic> parkingSpaces = jsonDecode(response.body);
+          
+          return parkingSpaces;
         } else {
-          throw Exception('User ID not found');
+          throw Exception('Failed to fetch parking spaces');
         }
-      } else {
-        throw Exception('User is not logged in');
+    } else {
+        throw Exception('User ID not found');
       }
     } catch (e) {
       throw Exception('Error fetching parking spaces: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchParkingSpaceById(String parkingId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/parking/fetchParkingById'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'parkingId': parkingId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> parkingSpace = jsonDecode(response.body);
+        return parkingSpace;
+      } else {
+        throw Exception('Failed to fetch parking space by ID');
+      }
+    } catch (e) {
+      throw Exception('Error fetching parking space by ID: $e');
     }
   }
 

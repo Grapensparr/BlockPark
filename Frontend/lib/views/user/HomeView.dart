@@ -22,21 +22,23 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const Header(),
-      body: FutureBuilder<Map<String, int>>(
-        future: statusCounts,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            final data = snapshot.data!;
-            final screenWidth = MediaQuery.of(context).size.width;
-            return screenWidth < 850
-                ? _buildStatusListOnePerRow(data)
-                : _buildStatusListOneRow(data);
-          }
-        },
+      body: SingleChildScrollView(
+        child: FutureBuilder<Map<String, int>>(
+          future: statusCounts,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              final data = snapshot.data!;
+              final screenWidth = MediaQuery.of(context).size.width;
+              return screenWidth < 850
+                  ? _buildStatusListOnePerRow(data)
+                  : _buildStatusListOneRow(data);
+            }
+          },
+        ),
       ),
     );
   }
