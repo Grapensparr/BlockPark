@@ -221,4 +221,31 @@ router.post('/fetchParkingById', async (req, res) => {
   }
 });
 
+router.post('/createBooking', async (req, res) => {
+  const { parkingId, status, renterId } = req.body;
+
+  try {
+    const parkingSpace = await ParkingModel.findById(parkingId);
+
+    if (!parkingSpace) {
+      return res.status(404).json({ msg: 'Listing not found' });
+    }
+
+    if (status === 'rented' && !renterId) {
+      return res.status(400).json({ msg: 'Renter ID is required when updating status to "rented"' });
+    }
+
+    parkingSpace.status = status;
+    if (renterId) {
+      parkingSpace.renter = renterId;
+    }
+    await parkingSpace.save();
+
+    res.status(200).json({ msg: 'Listing updated successfully', parkingSpace });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Failed to update listing status' });
+  }
+});
+
 module.exports = router;
