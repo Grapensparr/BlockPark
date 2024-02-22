@@ -1,32 +1,50 @@
+import 'package:blockpark/controllers/FetchController.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
   String? _loggedInUserEmail;
+  String? _loggedInUserId;
 
   String? get loggedInUserEmail => _loggedInUserEmail;
+  String? get loggedInUserId => _loggedInUserId;
 
   bool get isLoggedIn => _loggedInUserEmail != null;
 
   Future<void> login(String email) async {
-    _loggedInUserEmail = email;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('loggedInUser', email);
-    notifyListeners();
+    try {
+      final userId = await FetchController.getUserIdByEmail(email);
+      if (userId != null) {
+        _loggedInUserEmail = email;
+        _loggedInUserId = userId;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('loggedInUserEmail', email);
+        await prefs.setString('loggedInUserId', userId);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to fetch user ID');
+      }
+    } catch (e) {
+      throw Exception('Error logging in: $e');
+    }
   }
 
   Future<void> logout() async {
     _loggedInUserEmail = null;
+    _loggedInUserId = null;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('loggedInUser');
+    await prefs.remove('loggedInUserEmail');
+    await prefs.remove('loggedInUserId');
     notifyListeners();
   }
 
   Future<void> checkLoggedInUser() async {
     final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('loggedInUser');
-    if (email != null) {
+    final email = prefs.getString('loggedInUserEmail');
+    final userId = prefs.getString('loggedInUserId');
+    if (email != null && userId != null) {
       _loggedInUserEmail = email;
+      _loggedInUserId = userId;
       notifyListeners();
     }
   }

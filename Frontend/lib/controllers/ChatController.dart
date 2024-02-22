@@ -12,35 +12,31 @@ class ChatController {
       final authProvider = AuthProvider();
       await authProvider.checkLoggedInUser();
 
-      final userEmail = authProvider.loggedInUserEmail;
+      final userId = authProvider.loggedInUserId;
 
-      if (userEmail != null) {
-        final renter = await getUserIdByEmail(userEmail);
+      if (userId != null) {
+        final renter = userId;
 
-        if (renter != null) {
-          final response = await http.post(
-            Uri.parse('$baseUrl/chat/new'),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({
-              'owner': owner,
-              'renter': renter,
-              'parkingSpaceId': parkingSpaceId,
-            }),
-          );
+        final response = await http.post(
+          Uri.parse('$baseUrl/chat/new'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'owner': owner,
+            'renter': renter,
+            'parkingSpaceId': parkingSpaceId,
+          }),
+        );
 
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            final chatData = jsonDecode(response.body);
-            return chatData;
-          } else {
-            throw Exception('Failed to create or fetch chat: ${response.body}');
-          }
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final chatData = jsonDecode(response.body);
+          return chatData;
         } else {
-          throw Exception('User ID not found');
+          throw Exception('Failed to create or fetch chat: ${response.body}');
         }
       } else {
-        throw Exception('Owner email not found');
+        throw Exception('User ID not found');
       }
     } catch (e) {
       throw Exception('Error creating or fetching chat: $e');
@@ -75,62 +71,31 @@ class ChatController {
       final authProvider = AuthProvider();
       await authProvider.checkLoggedInUser();
 
-      final userEmail = authProvider.loggedInUserEmail;
+      final userId = authProvider.loggedInUserId;
 
-      if (userEmail != null) {
-        final userId = await getUserIdByEmail(userEmail);
+      if (userId != null) {
+        final response = await http.post(
+          Uri.parse('$baseUrl/chat/fetchAllByUser'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'userId': userId,
+          }),
+        );
 
-        if (userId != null) {
-          final response = await http.post(
-            Uri.parse('$baseUrl/chat/fetchAllByUser'),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({
-              'userId': userId,
-            }),
-          );
-
-          if (response.statusCode == 200) {
-            final List<dynamic> chatDataList = jsonDecode(response.body);
-            List<ChatData> chatData = chatDataList.map((data) => ChatData.fromJson(data)).toList();
-            return chatData;
-          } else {
-            throw Exception('Failed to fetch chats by user: ${response.body}');
-          }
+        if (response.statusCode == 200) {
+          final List<dynamic> chatDataList = jsonDecode(response.body);
+          List<ChatData> chatData = chatDataList.map((data) => ChatData.fromJson(data)).toList();
+          return chatData;
         } else {
-          throw Exception('User ID not found');
+          throw Exception('Failed to fetch chats by user: ${response.body}');
         }
       } else {
-        throw Exception('Owner email not found');
+        throw Exception('User ID not found');
       }
     } catch (e) {
       throw Exception('Error fetching chats by user: $e');
-    }
-  }
-
-  static Future<String?> getUserIdByEmail(String email) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/users/idByEmail'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final user = jsonDecode(response.body);
-        return user['_id'];
-      } else {
-        print('Failed to fetch user: ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      print('Error fetching user: $e');
-      return null;
     }
   }
 
