@@ -57,4 +57,44 @@ class UpdateController {
       throw Exception('Error removing listing: $e');
     }
   }
+
+  static Future<void> createBooking(String parkingId, String status, String renterId, BuildContext context) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/parking/createBooking'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'parkingId': parkingId,
+          'status': status,
+          'renterId': renterId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Booking created successfully'),
+          ),
+        );
+      } else if (response.statusCode == 400) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Renter ID is required when updating status to "rented"'),
+          ),
+        );
+      } else if (response.statusCode == 404) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Listing not found'),
+          ),
+        );
+      } else {
+        throw Exception('Failed to create booking');
+      }
+    } catch (e) {
+      throw Exception('Error creating booking: $e');
+    }
+  }
 }

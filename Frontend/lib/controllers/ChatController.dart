@@ -192,4 +192,28 @@ class ChatController {
       throw Exception('Error fetching chat data by ID: $e');
     }
   }
+
+  static Future<void> updateOfferStatus(String chatId, String fieldToUpdate, bool valueToUpdate) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/updateOffer'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'chatId': chatId,
+          'fieldToUpdate': fieldToUpdate,
+          'valueToUpdate': valueToUpdate,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Offer status updated successfully');
+      } else {
+        print('Failed to update offer status: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating offer status: $e');
+    }
+  }
 }

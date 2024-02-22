@@ -33,6 +33,21 @@ function socket(io) {
       }
     });
 
+    socket.on('offerUpdate', function (data) {
+      const ownerId = data.ownerId;
+      const renterId = data.renterId;
+    
+      const ownerSocket = userSockets.find(pair => pair.userId === ownerId);
+      if (ownerSocket) {
+        io.to(ownerSocket.socketId).emit('updateButton');
+      }
+    
+      const renterSocket = userSockets.find(pair => pair.userId === renterId);
+      if (renterSocket) {
+        io.to(renterSocket.socketId).emit('updateButton');
+      }
+    });
+
     socket.on('disconnect', function () {
       const index = userSockets.findIndex(pair => pair.socketId === socket.id);
       if (index !== -1) {

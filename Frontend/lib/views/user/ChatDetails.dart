@@ -1,6 +1,8 @@
 import 'package:blockpark/controllers/FetchController.dart';
+import 'package:blockpark/controllers/UpdateController.dart';
 import 'package:blockpark/providers/AuthProvider.dart';
 import 'package:blockpark/widgets/chats/MessageModel.dart';
+import 'package:blockpark/widgets/chats/OfferDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:blockpark/controllers/ChatController.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +26,7 @@ class _ChatDetailsState extends State<ChatDetails> {
   bool offerAccepted = false;
   late String owner;
   late String renter;
+  late String parkingId;
   String address = '';
   String zipCode = '';
   String city = '';
@@ -50,6 +53,9 @@ class _ChatDetailsState extends State<ChatDetails> {
     socket.on('reloadContent', (_) {
       fetchMessages();
     });
+    socket.on('updateButton', (_) {
+      fetchChatData();
+    });
   }
 
   void fetchChatData() async {
@@ -62,6 +68,7 @@ class _ChatDetailsState extends State<ChatDetails> {
         offerAccepted = chatData['offerAccepted'];
         owner = chatData['owner'];
         renter = chatData['renter'];
+        parkingId = chatData['parkingSpace'];
         address = parkingData['address'];
         zipCode = parkingData['zipCode'];
         city = parkingData['city'];
@@ -160,28 +167,75 @@ class _ChatDetailsState extends State<ChatDetails> {
         ),
         automaticallyImplyLeading: false,
         actions: [
-          if(isOwner)
+          if (isOwner)
+            if (!offerMade || !offerAccepted)
+              ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return OfferDialog(
+                        offerMade: offerMade,
+                        onOfferStatusChange: (status) {
+                          if (status) {
+                            ChatController.updateOfferStatus(widget.chatId, 'offerMade', true);
+                            socket.emit('offerUpdate', {
+                              'ownerId': currentUserId,
+                              'renterId': renter,
+                            });
+                          } else {
+                            ChatController.updateOfferStatus(widget.chatId, 'offerMade', false);
+                            socket.emit('offerUpdate', {
+                              'ownerId': currentUserId,
+                              'renterId': renter,
+                            });
+                          }
+                        },
+                      );
+                    },
+                  );
+                },
+                child: Text(offerMade ? 'Cancel offer' : 'Make offer'),
+              ),
+          if (!isOwner && offerMade && !offerAccepted)
             ElevatedButton(
               onPressed: () {
-                if (offerMade) {
-                  
-                } else {
-                  
-                }
-              },
-              child: Text(offerMade ? 'Cancel offer' : 'Make offer'),
-            ),
-          if(!isOwner && offerMade)
-            ElevatedButton(
-              onPressed: () {
-
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Confirmation'),
+                      content: const Text('Are you sure you want to accept this offer? Keep in mind that there is a 2-week notice period if you need to terminate the contract early.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Go back'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            ChatController.updateOfferStatus(widget.chatId, 'offerAccepted', true);
+                            UpdateController.createBooking(parkingId, 'rented', currentUserId, context);
+                            socket.emit('offerUpdate', {
+                              'ownerId': owner,
+                              'renterId': currentUserId,
+                            });
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Accept'),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
               child: const Text('Accept offer'),
             ),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
-              if(isOwner) {
+              if (isOwner) {
                 socket.emit('updateChats', owner);
               } else {
                 socket.emit('updateChats', renter);

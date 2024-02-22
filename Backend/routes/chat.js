@@ -176,4 +176,24 @@ router.post('/fetchById', async (req, res) => {
   }
 });
 
+router.post('/updateOffer', async (req, res) => {
+  const { chatId, fieldToUpdate, valueToUpdate } = req.body;
+
+  try {
+    if (fieldToUpdate !== 'offerMade' && fieldToUpdate !== 'offerAccepted') {
+      throw new Error('Invalid field to update. It must be either "offerMade" or "offerAccepted".');
+    }
+
+    const updatedChat = await ChatModel.findOneAndUpdate(
+      { _id: chatId },
+      { [fieldToUpdate]: valueToUpdate },
+    );
+
+    res.status(200).json(updatedChat);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 module.exports = router;
