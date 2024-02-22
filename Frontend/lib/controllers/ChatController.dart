@@ -169,4 +169,27 @@ class ChatController {
       print('Error updating message read status: $e');
     }
   }
+
+  static Future<Map<String, dynamic>> fetchChatDataById(String chatId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/fetchById'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'chatId': chatId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final chatData = jsonDecode(response.body);
+        return chatData;
+      } else {
+        throw Exception('Failed to fetch chat data by ID: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching chat data by ID: $e');
+    }
+  }
 }

@@ -13,7 +13,6 @@ class ChatCard extends StatelessWidget {
     IconData renterCheckmark = chatModel.isReadByRenter ? Icons.check_circle_outline_rounded : Icons.radio_button_unchecked;
     IconData ownerCheckmark = chatModel.isReadByOwner ? Icons.check_circle_outline : Icons.radio_button_unchecked;
 
-
     return Card(
       child: ListTile(
         leading: Icon(chatModel.icon),
@@ -21,9 +20,17 @@ class ChatCard extends StatelessWidget {
         subtitle: Row(
           children: [
             Text(chatModel.currentMessage),
-            SizedBox(width: 5,),
-            Icon(renterCheckmark, size: 12),
-            Icon(ownerCheckmark, size: 12),
+            const SizedBox(width: 5),
+            Icon(
+              ownerCheckmark,
+              size: 12,
+              color: chatModel.isReadByOwner ? Colors.green : Colors.red,
+            ),
+            Icon(
+              renterCheckmark,
+              size: 12,
+              color: chatModel.isReadByRenter ? Colors.green : Colors.red,
+            ),
           ],
         ),
         onTap: () {

@@ -1,15 +1,25 @@
 import 'package:blockpark/controllers/FetchController.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class AuthProvider with ChangeNotifier {
   String? _loggedInUserEmail;
   String? _loggedInUserId;
+  late io.Socket socket;
 
   String? get loggedInUserEmail => _loggedInUserEmail;
   String? get loggedInUserId => _loggedInUserId;
 
   bool get isLoggedIn => _loggedInUserEmail != null;
+
+  void connect() {
+    socket = io.io('http://localhost:3000', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+    socket.connect();
+  }
 
   Future<void> login(String email) async {
     try {
@@ -20,6 +30,8 @@ class AuthProvider with ChangeNotifier {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('loggedInUserEmail', email);
         await prefs.setString('loggedInUserId', userId);
+        connect();
+        socket.emit('authenticate', loggedInUserId);
         notifyListeners();
       } else {
         throw Exception('Failed to fetch user ID');
@@ -35,6 +47,7 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('loggedInUserEmail');
     await prefs.remove('loggedInUserId');
+    socket.disconnect();
     notifyListeners();
   }
 

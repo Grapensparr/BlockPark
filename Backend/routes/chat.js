@@ -159,4 +159,21 @@ router.post('/updateMessageReadStatus', async (req, res) => {
   }
 });
 
+router.post('/fetchById', async (req, res) => {
+  const { chatId } = req.body;
+
+  try {
+    const chat = await ChatModel.findById(chatId)
+      .select('-messages');
+
+    if (!chat) {
+      return res.status(404).json({ msg: 'Chat not found' });
+    }
+    res.status(200).json(chat);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: err });
+  }
+});
+
 module.exports = router;

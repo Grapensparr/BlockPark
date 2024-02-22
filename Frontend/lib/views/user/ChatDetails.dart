@@ -18,12 +18,36 @@ class _ChatDetailsState extends State<ChatDetails> {
   final TextEditingController _messageController = TextEditingController();
   List<MessageModel> _messages = [];
   late String currentUserId;
+  bool offerMade = false;
+  bool offerAccepted = false;
+  late String owner;
+  late String renter;
+  bool isOwner = false;
+
 
   @override
   void initState() {
     super.initState();
     fetchMessages();
     initCurrentUser();
+    fetchChatData();
+  }
+
+  void fetchChatData() async {
+    try {
+      final chatData = await ChatController.fetchChatDataById(widget.chatId);
+      setState(() {
+        offerMade = chatData['offerMade'];
+        offerAccepted = chatData['offerAccepted'];
+        owner = chatData['owner'];
+        renter = chatData['renter'];
+        if (currentUserId == owner) {
+          isOwner = true;
+        }
+      });
+    } catch (e) {
+      print('Error fetching chat data: $e');
+    }
   }
 
   void initCurrentUser() async {
@@ -76,6 +100,24 @@ class _ChatDetailsState extends State<ChatDetails> {
         title: const Text('Chat Details'),
         automaticallyImplyLeading: false,
         actions: [
+          if(isOwner)
+            ElevatedButton(
+              onPressed: () {
+                if (offerMade) {
+                  
+                } else {
+                  
+                }
+              },
+              child: Text(offerMade ? 'Cancel offer' : 'Make offer'),
+            ),
+          if(!isOwner && offerMade)
+            ElevatedButton(
+              onPressed: () {
+
+              },
+              child: const Text('Accept offer'),
+            ),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {

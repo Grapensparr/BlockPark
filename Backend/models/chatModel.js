@@ -43,7 +43,15 @@ const ChatSchema = mongoose.Schema({
       type: Boolean,
       default: false
     }
-  }]
+  }],
+  offerMade: {
+    type: Boolean,
+    default: false
+  },
+  offerAccepted: {
+    type: Boolean,
+    default: false
+  }
 });
 
 module.exports = mongoose.model('Chat', ChatSchema);
