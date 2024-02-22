@@ -1,8 +1,10 @@
+import 'package:blockpark/controllers/FetchController.dart';
 import 'package:blockpark/providers/AuthProvider.dart';
 import 'package:blockpark/widgets/chats/MessageModel.dart';
 import 'package:flutter/material.dart';
 import 'package:blockpark/controllers/ChatController.dart';
 import 'package:intl/intl.dart';
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class ChatDetails extends StatefulWidget {
   final String chatId;
@@ -22,25 +24,59 @@ class _ChatDetailsState extends State<ChatDetails> {
   bool offerAccepted = false;
   late String owner;
   late String renter;
+  String address = '';
+  String zipCode = '';
+  String city = '';
+  String status = '';
+  String formatedStatus = '';
   bool isOwner = false;
-
+  late io.Socket socket = AuthProvider().socket;
 
   @override
   void initState() {
     super.initState();
+    connect();
     fetchMessages();
     initCurrentUser();
     fetchChatData();
   }
 
+  void connect() {
+    socket = io.io('http://localhost:3000', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+    socket.connect();
+    socket.on('reloadContent', (_) {
+      fetchMessages();
+    });
+  }
+
   void fetchChatData() async {
     try {
       final chatData = await ChatController.fetchChatDataById(widget.chatId);
+      final parkingData = await FetchController.fetchParkingSpaceById(chatData['parkingSpace']);
+
       setState(() {
         offerMade = chatData['offerMade'];
         offerAccepted = chatData['offerAccepted'];
         owner = chatData['owner'];
         renter = chatData['renter'];
+        address = parkingData['address'];
+        zipCode = parkingData['zipCode'];
+        city = parkingData['city'];
+        status = parkingData['status'];
+
+        if (status == 'onHold') {
+          formatedStatus = 'On hold';
+        } else if (status == 'rentingComplete') {
+          formatedStatus = 'Renting completed';
+        } else if (status == 'cancelled') {
+          formatedStatus = 'Advertisement deleted';
+        } else {
+          formatedStatus = status[0].toUpperCase() + status.substring(1);
+        }
+
         if (currentUserId == owner) {
           isOwner = true;
         }
@@ -55,6 +91,7 @@ class _ChatDetailsState extends State<ChatDetails> {
     await authProvider.checkLoggedInUser();
     currentUserId = authProvider.loggedInUserId!;
     updateMessageReadStatus();
+    socket.emit('checkAuthentication', currentUserId);
   }
 
   void updateMessageReadStatus() async {
@@ -83,11 +120,21 @@ class _ChatDetailsState extends State<ChatDetails> {
         text: messageText,
         timestamp: DateTime.now(),
       );
+
       await ChatController.saveMessage(widget.chatId, newMessage, currentUserId);
+
       setState(() {
         _messages.add(newMessage);
         _messageController.clear();
       });
+
+      if(isOwner) {
+        socket.emit('newMessage', renter);
+        socket.emit('updateChats', renter);
+      } else {
+        socket.emit('newMessage', owner);
+        socket.emit('updateChats', owner);
+      }
     } catch (e) {
       print('Error sending message: $e');
     }
@@ -97,7 +144,20 @@ class _ChatDetailsState extends State<ChatDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat Details'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$address, $zipCode, $city',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Status: $formatedStatus',
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
         automaticallyImplyLeading: false,
         actions: [
           if(isOwner)
@@ -121,6 +181,11 @@ class _ChatDetailsState extends State<ChatDetails> {
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
+              if(isOwner) {
+                socket.emit('updateChats', owner);
+              } else {
+                socket.emit('updateChats', renter);
+              }
               widget.onClose();
               Navigator.pop(context);
             },

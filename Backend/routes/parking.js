@@ -204,4 +204,21 @@ router.get('/statusCounts', async (req, res) => {
   }
 });
 
+router.post('/fetchParkingById', async (req, res) => {
+  const { parkingId } = req.body;
+
+  try {
+    const parkingSpace = await ParkingModel.findById(parkingId);
+    
+    if (!parkingSpace) {
+      return res.status(404).json({ msg: 'Parking space not found' });
+    }
+
+    res.status(200).json(parkingSpace);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Failed to fetch parking space' });
+  }
+});
+
 module.exports = router;

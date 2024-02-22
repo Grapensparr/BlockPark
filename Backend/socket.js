@@ -10,6 +10,29 @@ function socket(io) {
       console.log(userSockets);
     });
 
+    socket.on('checkAuthentication', function (userId) {
+      const userExists = userSockets.some(pair => pair.userId === userId);
+      if (!userExists) {
+        userSockets.push({ userId: userId, socketId: socket.id });
+        console.log('User added to authentication list:', userId);
+        console.log(userSockets);
+      }
+    });
+
+    socket.on('newMessage', function (userId) {
+      const renterSocket = userSockets.find(pair => pair.userId === userId);
+      if (renterSocket) {
+        io.to(renterSocket.socketId).emit('reloadContent');
+      }
+    });
+
+    socket.on('updateChats', function (userId) {
+      const renterSocket = userSockets.find(pair => pair.userId === userId);
+      if (renterSocket) {
+        io.to(renterSocket.socketId).emit('reloadChats');
+      }
+    });
+
     socket.on('disconnect', function () {
       const index = userSockets.findIndex(pair => pair.socketId === socket.id);
       if (index !== -1) {

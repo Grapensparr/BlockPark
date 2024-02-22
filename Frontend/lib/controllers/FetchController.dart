@@ -71,6 +71,29 @@ class FetchController {
     }
   }
 
+  static Future<Map<String, dynamic>> fetchParkingSpaceById(String parkingId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/parking/fetchParkingById'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'parkingId': parkingId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> parkingSpace = jsonDecode(response.body);
+        return parkingSpace;
+      } else {
+        throw Exception('Failed to fetch parking space by ID');
+      }
+    } catch (e) {
+      throw Exception('Error fetching parking space by ID: $e');
+    }
+  }
+
   static Future<Map<String, int>> fetchStatusCounts() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/parking/statusCounts'));

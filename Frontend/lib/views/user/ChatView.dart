@@ -1,4 +1,5 @@
 import 'package:blockpark/controllers/ChatController.dart';
+import 'package:blockpark/providers/AuthProvider.dart';
 import 'package:blockpark/widgets/appBar/Header.dart';
 import 'package:blockpark/widgets/chats/ChatCard.dart';
 import 'package:blockpark/widgets/chats/ChatData.dart';
@@ -14,7 +15,7 @@ class ChatView extends StatefulWidget {
 }
 
 class _ChatViewState extends State<ChatView> {
-  late io.Socket socket;
+  late io.Socket socket = AuthProvider().socket;
 
   List<ChatModel> chats = [];
   bool loading = true;
@@ -32,7 +33,9 @@ class _ChatViewState extends State<ChatView> {
       'autoConnect': false,
     });
     socket.connect();
-    socket.onConnect((data) => print('Connected to server'));
+    socket.on('reloadChats', (_) {
+      fetchChatsFromDatabase();
+    });
   }
 
   void fetchChatsFromDatabase() async {
