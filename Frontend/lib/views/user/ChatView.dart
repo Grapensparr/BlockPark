@@ -38,6 +38,9 @@ class _ChatViewState extends State<ChatView> {
   void fetchChatsFromDatabase() async {
     try {
       final List<ChatData> chatData = await ChatController.fetchAllChatsByUser();
+
+      chatData.sort((a, b) => b.latestMessageCreatedAt.compareTo(a.latestMessageCreatedAt));
+
       setState(() {
         chats = chatData.map((data) => ChatModel(
           chatId: data.chatId,

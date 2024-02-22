@@ -122,4 +122,51 @@ class ChatController {
       throw Exception('Error fetching messages by chat ID: $e');
     }
   }
+
+  static Future<void> saveMessage(String chatId, MessageModel message, String senderId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/saveMessage'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'chatId': chatId,
+          'message': message.toJson(),
+          'senderId': senderId,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        print('Message saved successfully');
+      } else {
+        print('Failed to save message: ${response.body}');
+      }
+    } catch (e) {
+      print('Error saving message: $e');
+    }
+  }
+
+  static Future<void> updateMessageReadStatus(String chatId, String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/updateMessageReadStatus'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'chatId': chatId,
+          'userId': userId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Message read status updated successfully');
+      } else {
+        print('Failed to update message read status: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating message read status: $e');
+    }
+  }
 }

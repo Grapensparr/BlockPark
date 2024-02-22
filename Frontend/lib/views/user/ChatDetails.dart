@@ -1,3 +1,4 @@
+import 'package:blockpark/providers/AuthProvider.dart';
 import 'package:blockpark/widgets/chats/MessageModel.dart';
 import 'package:flutter/material.dart';
 import 'package:blockpark/controllers/ChatController.dart';
@@ -16,11 +17,28 @@ class ChatDetails extends StatefulWidget {
 class _ChatDetailsState extends State<ChatDetails> {
   final TextEditingController _messageController = TextEditingController();
   List<MessageModel> _messages = [];
+  late String currentUserId;
 
   @override
   void initState() {
     super.initState();
     fetchMessages();
+    initCurrentUser();
+  }
+
+  void initCurrentUser() async {
+    final authProvider = AuthProvider();
+    await authProvider.checkLoggedInUser();
+    currentUserId = authProvider.loggedInUserId!;
+    updateMessageReadStatus();
+  }
+
+  void updateMessageReadStatus() async {
+    try {
+      await ChatController.updateMessageReadStatus(widget.chatId, currentUserId);
+    } catch (e) {
+      print('Error updating message read status: $e');
+    }
   }
 
   void fetchMessages() async {
@@ -34,15 +52,36 @@ class _ChatDetailsState extends State<ChatDetails> {
     }
   }
 
+  Future<void> sendMessage(String messageText) async {
+    try {
+      final newMessage = MessageModel(
+        senderId: currentUserId,
+        text: messageText,
+        timestamp: DateTime.now(),
+      );
+      await ChatController.saveMessage(widget.chatId, newMessage, currentUserId);
+      setState(() {
+        _messages.add(newMessage);
+        _messageController.clear();
+      });
+    } catch (e) {
+      print('Error sending message: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat Details'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: widget.onClose,
+            onPressed: () {
+              widget.onClose();
+              Navigator.pop(context);
+            },
           ),
         ],
       ),
@@ -53,8 +92,8 @@ class _ChatDetailsState extends State<ChatDetails> {
               itemCount: _messages.length,
               reverse: true,
               itemBuilder: (context, index) {
-                final message = _messages[index];
-                final isCurrentUser = message.senderId == 'currentUserId';
+                final message = _messages.reversed.toList()[index]; 
+                final isCurrentUser = message.senderId == currentUserId;
                 if (index == _messages.length - 1) {
                   return Center(
                     child: Container(
@@ -125,15 +164,7 @@ class _ChatDetailsState extends State<ChatDetails> {
                   onPressed: () {
                     String messageText = _messageController.text;
                     if (messageText.isNotEmpty) {
-                      final newMessage = MessageModel(
-                        senderId: 'currentUserId',
-                        text: messageText,
-                        timestamp: DateTime.now(),
-                      );
-                      setState(() {
-                        _messages.insert(0, newMessage);
-                        _messageController.clear();
-                      });
+                      sendMessage(messageText);
                     }
                   },
                 ),

@@ -16,4 +16,12 @@ class MessageModel {
       timestamp: DateTime.parse(json['timestamp']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'senderId': senderId,
+      'text': text,
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
 }

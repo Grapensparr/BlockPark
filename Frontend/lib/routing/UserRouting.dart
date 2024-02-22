@@ -9,7 +9,8 @@ import 'package:blockpark/widgets/navigation/NavigationRail.dart';
 import 'package:flutter/material.dart';
 
 class UserRouting extends StatefulWidget {
-  static final GlobalKey<_UserRoutingState> userRoutingKey = GlobalKey<_UserRoutingState>();
+  static final GlobalKey<_UserRoutingState> userRoutingKey =
+    GlobalKey<_UserRoutingState>();
 
   const UserRouting({Key? key}) : super(key: key);
 
@@ -17,14 +18,13 @@ class UserRouting extends StatefulWidget {
   _UserRoutingState createState() => _UserRoutingState();
 }
 
-
 class _UserRoutingState extends State<UserRouting> {
-  final List<Widget> _screens = [
-    const HomeView(),
-    const PostView(),
-    const SearchView(),
-    const ChatView(),
-    const ProfileView()
+  final List<Widget> _screens = const [
+    HomeView(),
+    PostView(),
+    SearchView(),
+    ChatView(),
+    ProfileView()
   ];
 
   int _selectedIndex = 0;
@@ -66,7 +66,8 @@ class _UserRoutingState extends State<UserRouting> {
                   setState(() {
                     _isChatOpen = false;
                   });
-                }, 
+                  Navigator.pop(context, true);
+                },
                 chatId: _chatId,
               ),
             ),
