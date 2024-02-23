@@ -28,7 +28,7 @@ class _ChatViewState extends State<ChatView> {
   }
 
   void connect() {
-    socket = io.io('http://localhost:3000', <String, dynamic>{
+    socket = io.io('https://lionfish-app-yctot.ondigitalocean.app/', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });

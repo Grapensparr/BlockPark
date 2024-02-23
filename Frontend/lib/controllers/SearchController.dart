@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SearchController {
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://lionfish-app-yctot.ondigitalocean.app';
 
   static Future<List<Map<String, dynamic>>> searchParking({
     String? city,
