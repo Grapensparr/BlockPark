@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:blockpark/providers/AuthProvider.dart';
 
 class ChatController {
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://lionfish-app-yctot.ondigitalocean.app';
 
   static Future<Map<String, dynamic>> createOrFetchChat(String owner, String parkingSpaceId) async {
     try {

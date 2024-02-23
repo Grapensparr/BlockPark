@@ -14,7 +14,7 @@ class AuthProvider with ChangeNotifier {
   bool get isLoggedIn => _loggedInUserEmail != null;
 
   void connect() {
-    socket = io.io('http://localhost:3000', <String, dynamic>{
+    socket = io.io('https://lionfish-app-yctot.ondigitalocean.app', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });

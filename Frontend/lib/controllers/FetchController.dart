@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:blockpark/providers/AuthProvider.dart';
 
 class FetchController {
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://lionfish-app-yctot.ondigitalocean.app';
 
   static Future<List<dynamic>> fetchParkingSpacesByOwner() async {
     try {

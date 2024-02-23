@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 class LoginController {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
-  static const URL = 'http://localhost:3000';
+  static const URL = 'https://lionfish-app-yctot.ondigitalocean.app';
 
   Future<void> loginUser(ScaffoldMessengerState scaffoldMessenger, BuildContext context) async {
     final userEmail = email.text.trim();

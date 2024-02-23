@@ -7,7 +7,7 @@ class SignupController {
   final TextEditingController dateOfBirth = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
-  static const URL = 'http://localhost:3000';
+  static const URL = 'https://lionfish-app-yctot.ondigitalocean.app';
 
   Future<void> registerUser(ScaffoldMessengerState scaffoldMessenger) async {
     final username = fullName.text.trim();

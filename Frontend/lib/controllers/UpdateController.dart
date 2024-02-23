@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class UpdateController {
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://lionfish-app-yctot.ondigitalocean.app';
 
   static Future<void> updateParkingStatus(String parkingId, String status, BuildContext context) async {
     try {
