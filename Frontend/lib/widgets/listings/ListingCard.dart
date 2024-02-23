@@ -1,4 +1,5 @@
 import 'package:blockpark/controllers/UpdateController.dart';
+import 'package:blockpark/widgets/listings/EditParkingSpace.dart';
 import 'package:flutter/material.dart';
 
 class ListingCard extends StatelessWidget {
@@ -125,7 +126,10 @@ class ListingCard extends StatelessWidget {
                           width: 90,
                           child: ElevatedButton(
                             onPressed: () {
-                              
+                              showDialog(
+                                context: context,
+                                builder: (context) => EditParkingSpace(listingData: listing),
+                              );
                             },
                             child: const Text('Edit'),
                           ),
@@ -167,7 +171,10 @@ class ListingCard extends StatelessWidget {
                           width: 90,
                           child: ElevatedButton(
                             onPressed: () {
-                              
+                              showDialog(
+                                context: context,
+                                builder: (context) => EditParkingSpace(listingData: listing),
+                              );
                             },
                             child: const Text('Edit'),
                           ),
@@ -192,6 +199,51 @@ class ListingCard extends StatelessWidget {
                               refreshData();
                             },
                             child: const Text('Delete'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              if (listing['status'] == 'rented')
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Terminate Lease'),
+                                    content: const Text('Are you sure you want to terminate the lease?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('No'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          await UpdateController.updateParkingStatus('${listing['_id']}', 'rentingComplete', context);
+                                          fetchParkingSpacesData();
+                                          refreshData();
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: const Text('Terminate the lease'),
                           ),
                         ),
                       ],

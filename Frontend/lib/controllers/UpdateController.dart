@@ -97,4 +97,31 @@ class UpdateController {
       throw Exception('Error creating booking: $e');
     }
   }
+
+  static Future<void> updateParkingSpace(String parkingId, Map<String, dynamic> updatedValues, BuildContext context) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/parking/updateParkingSpace'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'parkingId': parkingId,
+          'updatedValues': updatedValues,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Advertisement updated successfully'),
+          ),
+        );
+      } else {
+        throw Exception('Failed to update parking space');
+      }
+    } catch (e) {
+      throw Exception('Error updating parking space: $e');
+    }
+  }
 }
