@@ -184,19 +184,6 @@ class _SearchViewState extends State<SearchView> {
                           controller: _priceController,
                         ),
                       ),
-                      Checkbox(
-                        value: _unlimitedPrice,
-                        onChanged: (value) {
-                          setState(() {
-                            _unlimitedPrice = value!;
-                            if (value) {
-                              _priceController.text = '';
-                              _price = null;
-                            }
-                          });
-                        },
-                      ),
-                      const Text('Unlimited price'),
                     ],
                   ),
                   const SizedBox(height: 16.0),

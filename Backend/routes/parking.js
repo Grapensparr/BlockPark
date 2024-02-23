@@ -248,4 +248,30 @@ router.post('/createBooking', async (req, res) => {
   }
 });
 
+router.post('/updateParkingSpace', async (req, res) => {
+  const {
+    parkingId,
+    updatedValues
+  } = req.body;
+
+  try {
+    const parkingSpace = await ParkingModel.findById(parkingId);
+
+    if (!parkingSpace) {
+      return res.status(404).json({ msg: 'Parking space not found' });
+    }
+
+    Object.keys(updatedValues).forEach(key => {
+      parkingSpace[key] = updatedValues[key];
+    });
+
+    await parkingSpace.save();
+
+    res.status(200).json({ msg: 'Parking space updated successfully', parkingSpace });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Failed to update parking space details' });
+  }
+});
+
 module.exports = router;

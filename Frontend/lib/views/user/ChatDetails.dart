@@ -5,6 +5,7 @@ import 'package:blockpark/widgets/chats/MessageModel.dart';
 import 'package:blockpark/widgets/chats/OfferDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:blockpark/controllers/ChatController.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -315,6 +316,11 @@ class _ChatDetailsState extends State<ChatDetails> {
                 Expanded(
                   child: TextField(
                     controller: _messageController,
+                    onSubmitted: (String messageText) {
+                      if (messageText.isNotEmpty) {
+                        sendMessage(messageText);
+                      }
+                    },
                     decoration: const InputDecoration(
                       hintText: 'Type a message...',
                     ),
