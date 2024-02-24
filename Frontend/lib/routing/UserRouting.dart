@@ -1,3 +1,4 @@
+import 'package:blockpark/controllers/FetchController.dart';
 import 'package:blockpark/views/user/ChatDetails.dart';
 import 'package:blockpark/views/user/ChatView.dart';
 import 'package:blockpark/views/user/HomeView.dart';
@@ -19,12 +20,17 @@ class UserRouting extends StatefulWidget {
 }
 
 class _UserRoutingState extends State<UserRouting> {
-  final List<Widget> _screens = const [
-    HomeView(),
-    PostView(),
-    SearchView(),
-    ChatView(),
-    ProfileView()
+  final List<Widget> _screens = [
+    HomeView(
+      statusCounts: FetchController.fetchStatusCounts()
+    ),
+    const PostView(),
+    const SearchView(),
+    const ChatView(),
+    ProfileView(
+      futureOwnerParkingSpaces: FetchController.fetchParkingSpacesByOwner(),
+      futureRenterParkingSpaces: FetchController.fetchParkingSpacesByRenter()
+    )
   ];
 
   int _selectedIndex = 0;

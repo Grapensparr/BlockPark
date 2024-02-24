@@ -4,27 +4,26 @@ import 'package:blockpark/widgets/listings/ListingCard.dart';
 import 'package:flutter/material.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  Future<List<dynamic>> futureOwnerParkingSpaces;
+  Future<List<dynamic>> futureRenterParkingSpaces;
+
+  ProfileView({
+    super.key,
+    required this.futureOwnerParkingSpaces, 
+    required this.futureRenterParkingSpaces
+  });
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  late Future<List<dynamic>> _futureOwnerParkingSpaces;
-  late Future<List<dynamic>> _futureRenterParkingSpaces;
   final Map<String, bool> _isExpanded = {'Parking spaces as owner': false, 'Parking spaces as renter': false};
   final List<String> _categories = ['Parking spaces as owner', 'Parking spaces as renter'];
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchParkingSpacesData();
-  }
-
-  void _fetchParkingSpacesData() {
-    _futureOwnerParkingSpaces = FetchController.fetchParkingSpacesByOwner();
-    _futureRenterParkingSpaces = FetchController.fetchParkingSpacesByRenter();
+  void _fetchParkingSpacesData() async {
+    widget.futureOwnerParkingSpaces = FetchController.fetchParkingSpacesByOwner();
+    widget.futureRenterParkingSpaces = FetchController.fetchParkingSpacesByRenter();
   }
 
   @override
@@ -32,7 +31,7 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: const Header(),
       body: FutureBuilder<List<dynamic>>(
-        future: _futureOwnerParkingSpaces,
+        future: widget.futureOwnerParkingSpaces,
         builder: (context, ownerSnapshot) {
           if (ownerSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -42,7 +41,7 @@ class _ProfileViewState extends State<ProfileView> {
             List<dynamic> ownerParkingSpaces = ownerSnapshot.data ?? [];
 
             return FutureBuilder<List<dynamic>>(
-              future: _futureRenterParkingSpaces,
+              future: widget.futureRenterParkingSpaces,
               builder: (context, renterSnapshot) {
                 if (renterSnapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:blockpark/widgets/appBar/Header.dart';
-import 'package:blockpark/controllers/FetchController.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  final Future<Map<String, int>> statusCounts;
+
+  const HomeView({
+    super.key,
+    required this.statusCounts
+  });
 
   @override
   State<HomeView> createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  late Future<Map<String, int>> statusCounts;
-
-  @override
-  void initState() {
-    super.initState();
-    statusCounts = FetchController.fetchStatusCounts();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const Header(),
       body: SingleChildScrollView(
         child: FutureBuilder<Map<String, int>>(
-          future: statusCounts,
+          future: widget.statusCounts,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
