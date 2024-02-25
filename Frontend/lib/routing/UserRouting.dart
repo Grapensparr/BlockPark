@@ -1,12 +1,11 @@
-import 'package:blockpark/controllers/FetchController.dart';
 import 'package:blockpark/views/user/ChatDetails.dart';
 import 'package:blockpark/views/user/ChatView.dart';
-import 'package:blockpark/views/user/HomeView.dart';
 import 'package:blockpark/views/user/PostView.dart';
-import 'package:blockpark/views/user/ProfileView.dart';
 import 'package:blockpark/views/user/SearchView.dart';
+import 'package:blockpark/widgets/wrappers/HomeViewWrapper.dart';
 import 'package:blockpark/widgets/navigation/BottomNavigation.dart';
 import 'package:blockpark/widgets/navigation/NavigationRail.dart';
+import 'package:blockpark/widgets/wrappers/ProfileViewWrapper.dart';
 import 'package:flutter/material.dart';
 
 class UserRouting extends StatefulWidget {
@@ -21,16 +20,11 @@ class UserRouting extends StatefulWidget {
 
 class _UserRoutingState extends State<UserRouting> {
   final List<Widget> _screens = [
-    HomeView(
-      statusCounts: FetchController.fetchStatusCounts()
-    ),
+    const HomeViewWrapper(),
     const PostView(),
     const SearchView(),
     const ChatView(),
-    ProfileView(
-      futureOwnerParkingSpaces: FetchController.fetchParkingSpacesByOwner(),
-      futureRenterParkingSpaces: FetchController.fetchParkingSpacesByRenter()
-    )
+    const ProfileViewWrapper(),
   ];
 
   int _selectedIndex = 0;
