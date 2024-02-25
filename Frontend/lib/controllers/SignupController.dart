@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:blockpark/views/landing/LoginView.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,7 +10,7 @@ class SignupController {
   final TextEditingController password = TextEditingController();
   static const URL = 'https://lionfish-app-yctot.ondigitalocean.app';
 
-  Future<void> registerUser(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<void> registerUser(BuildContext context, ScaffoldMessengerState scaffoldMessenger) async {
     final username = fullName.text.trim();
     final userDateOfBirth = dateOfBirth.text.trim();
     final userEmail = email.text.trim();
@@ -37,6 +38,10 @@ class SignupController {
           SnackBar(
             content: Text('User with email ${data['email']} has been created!'),
           ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginView()),
         );
       } else if (response.statusCode == 400 && response.body.contains('Email already exists')) {
         scaffoldMessenger.showSnackBar(

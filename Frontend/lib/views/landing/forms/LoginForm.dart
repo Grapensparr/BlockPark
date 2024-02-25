@@ -19,56 +19,61 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
 
-    return Form(
-      key: formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            controller: controller.email,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person_outline_outlined),
-              labelText: 'Email',
-              hintText: 'Email',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10,),
-          TextFormField(
-            controller: controller.password,
-            obscureText: !_isPasswordVisible,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.fingerprint),
-              labelText: 'Password',
-              hintText: 'Password',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
-                icon: Icon(
-                  _isPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
+    return Center(
+      child: Form(
+        key: formKey,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: controller.email,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.person_outline_outlined),
+                  labelText: 'Email',
+                  hintText: 'Email',
+                  border: OutlineInputBorder(),
                 ),
               ),
-            ),
+              const SizedBox(height: 10,),
+              TextFormField(
+                controller: controller.password,
+                obscureText: !_isPasswordVisible,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.fingerprint),
+                  labelText: 'Password',
+                  hintText: 'Password',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10,),
+              Align(
+                alignment: Alignment.center,
+                child: OutlinedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      controller.loginUser(widget.scaffoldMessenger, context);
+                    }
+                  },
+                  child: const Text('Login'), 
+                ),
+              )
+            ],
           ),
-          const SizedBox(height: 10,),
-          Align(
-            alignment: Alignment.center,
-            child: OutlinedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  controller.loginUser(widget.scaffoldMessenger, context);
-                }
-              },
-              child: const Text('Login'), 
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
